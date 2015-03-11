@@ -33,6 +33,7 @@
 **删除**
 
 
+
 """
 
 __author__ = '何琪'
@@ -42,12 +43,15 @@ class RBTree:
     """
     """
     def __init__(self):
+        self.root = None
+
         pass
 
     def insert(self, node, comp):
         """向红黑树中插入一个节点.
-        :param node 待插入的节点.
-        :param comp 节点比较大小的函数."""
+        :param node: 待插入的节点.
+        :param comp: 节点比较大小的函数."""
+
         pass
 
     def create(self, nodes, comp):
@@ -72,3 +76,17 @@ class RBTree:
         """遍历红黑树, 这个方法返回一个生成器. 利用返回的生成器的next()方法
         遍历树."""
         pass
+
+    def _leftrotate(self, node):
+        """
+        以node为顶点的子树进行左旋操作．
+        :param node:　以node节点旋转．
+        :return:　没有返回值
+        """
+
+    def _rightrotate(self, node):
+        """
+        以node为顶点的子树进行右旋操作．
+        :param node:　以node节点旋转．
+        :return:　没有返回值
+        """
