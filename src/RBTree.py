@@ -38,6 +38,8 @@
 
 __author__ = '何琪'
 
+from graphviz import Digraph
+
 
 class RBTree:
     """
@@ -72,9 +74,14 @@ class RBTree:
         :param comp 节点比较大小的函数."""
         pass
 
-    def traversal(self):
-        """遍历红黑树, 这个方法返回一个生成器. 利用返回的生成器的next()方法
-        遍历树."""
+    def traversal(self, node, style='preorder'):
+        """
+        遍历红黑树, 这个方法返回一个生成器. 利用返回的生成器的next()方法
+        遍历树.
+        :param node: 起始顶点。
+        :param style: 遍历方式，默认是先序遍历。还可以指定中序遍历，后序遍历。
+        :return:
+        """
         pass
 
     def _leftrotate(self, node):
@@ -90,3 +97,12 @@ class RBTree:
         :param node:　以node节点旋转．
         :return:　没有返回值
         """
+
+    def visualization(self, node):
+        """
+        以node为顶点节点，画出这个子树。输出为pdf文件。树的可视化输出。
+        :param node: 子树的顶点。
+        :return:
+        """
+        dot = Digraph(comment="")
+        for i in
