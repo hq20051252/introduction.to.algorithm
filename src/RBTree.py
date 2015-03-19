@@ -41,18 +41,54 @@ __author__ = '何琪'
 from graphviz import Digraph
 
 
+class Node:
+    """
+    红黑树的节点类型．
+    有属性：颜色(红/黑), 值, 父节点指针, 子节点指针, 比较算法.
+    """
+    def __init__(self, value, comp=cmp, color='red', parent=None, left=None, right=None):
+        self.color = color
+        self.value = value
+        self.comp = comp
+        self.parent = parent
+        self.left = left
+        self.right = right
+
+    def __cmp__(self, other):
+        """
+        用于比较两个节点内的值的大小.
+        """
+        return self.comp(self.value, other.value)
+
+
+class Nil(Node):
+    def __init__(self):
+        super(Nil, self).__init__(self, None, comp=None, color='black')
+
+
 class RBTree:
     """
     """
-    def __init__(self):
+    def __init__(self, comp=cmp):
         self.root = None
+        self.comp = comp
 
-        pass
+    def insert(self, value):
+        """向红黑树中插入一个值.
+        :param value: 待插入的值.
+        """
+        insert = Node(value)
+        node = self._findinsertposition(insert)
 
-    def insert(self, node, comp):
-        """向红黑树中插入一个节点.
-        :param node: 待插入的节点.
-        :param comp: 节点比较大小的函数."""
+        if node < insert:
+            node.right = insert
+            insert.parent = node
+
+        else:
+
+
+
+
 
         pass
 
@@ -68,10 +104,10 @@ class RBTree:
         :param comp 节点比较大小的函数."""
         pass
 
-    def find(self, node, comp):
+    def find(self, value, comp):
         """查找给定节点.
-        :param node 要查找的节点.
-        :param comp 节点比较大小的函数."""
+        :param value: 要查找的节点.
+        :param comp: 节点比较大小的函数."""
         pass
 
     def traversal(self, node, style='preorder'):
@@ -84,19 +120,57 @@ class RBTree:
         """
         pass
 
-    def _leftrotate(self, node):
+    @staticmethod
+    def _leftrotate(node):
         """
         以node为顶点的子树进行左旋操作．
         :param node:　以node节点旋转．
         :return:　没有返回值
         """
+        isleft = lambda x: x.parent.left == x
 
-    def _rightrotate(self, node):
+        parent = node.parent
+        right = node.right
+        gson = node.right.left
+
+        gson.parent = node
+        node.right = gson
+
+        node.parent = right
+        right.left = node
+
+        if isleft(node):
+            parent.left = right
+        else:
+            parent.right = right
+
+        right.parent = parent
+
+    @staticmethod
+    def _rightrotate(node):
         """
         以node为顶点的子树进行右旋操作．
         :param node:　以node节点旋转．
         :return:　没有返回值
         """
+        isleft = lambda x: x.parent.left == x
+
+        parent = node.parent
+        left = node.left
+        gson = node.left.right
+
+        gson.parent = node
+        node.left = gson
+
+        node.parent = left
+        left.right = node
+
+        if isleft(node):
+            parent.left = left
+        else:
+            parent.right = left
+
+        left.parent = parent
 
     def visualization(self, node):
         """
@@ -104,5 +178,19 @@ class RBTree:
         :param node: 子树的顶点。
         :return:
         """
+
         dot = Digraph(comment="")
-        for i in
+
+        for i, path in self.traversal(node):
+            if i.color == 'red':
+                dot.node(path.name, label=i.data, fillcolor='red', fontcolor='black')
+            else:
+                dot.node(path.name, label=i.data, fillcolor='black', fontcolor='white')
+
+            if i.left is not None:
+                dot.edge(path.name, path.name + "0")
+            if i.right is not None:
+                dot.edge(path.name, path.name + "1")
+
+        return dot.render()
+
