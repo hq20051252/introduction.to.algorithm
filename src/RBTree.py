@@ -73,24 +73,36 @@ class RBTree:
         self.root = None
         self.comp = comp
 
+    def _findinsertposition(self, insert):
+        """
+        查找插入节点.
+        :param insert:
+        :return:
+        """
+        return insert
+
+    def _fixrbtree(self, node):
+        """
+        修正树, 使符合红黑树的性质.
+        :param node:
+        :return:
+        """
+        return self.root
+
     def insert(self, value):
         """向红黑树中插入一个值.
         :param value: 待插入的值.
         """
-        insert = Node(value)
+        insert = Node(value, color='red')
         node = self._findinsertposition(insert)
 
+        insert.parent = node
         if node < insert:
             node.right = insert
-            insert.parent = node
-
         else:
+            node.left = insert
 
-
-
-
-
-        pass
+        self._fixRBTree(insert)
 
     def create(self, nodes, comp):
         """从一列节点构造出红黑树, 不断调用insert方法插入节点.
