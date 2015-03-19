@@ -69,6 +69,8 @@ class Nil(Node):
 class RBTree:
     """
     """
+    nil = Nil()
+
     def __init__(self, comp=cmp):
         self.root = None
         self.comp = comp
@@ -79,7 +81,16 @@ class RBTree:
         :param insert:
         :return:
         """
-        return insert
+        cur = self.root
+
+        while cur is not self.__class__.nil:
+            node = cur
+            if insert >= cur:
+                cur = cur.right
+            else:
+                cur = cur.left
+
+        return node
 
     def _fixrbtree(self, node):
         """
@@ -102,7 +113,7 @@ class RBTree:
         else:
             node.left = insert
 
-        self._fixRBTree(insert)
+        self._fixrbtree(insert)
 
     def create(self, nodes, comp):
         """从一列节点构造出红黑树, 不断调用insert方法插入节点.
