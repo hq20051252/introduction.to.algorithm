@@ -83,7 +83,7 @@ class RBTree:
         """
         cur = self.root
 
-        while cur is not self.__class__.nil:
+        while cur is not self.nil:
             node = cur
             if insert >= cur:
                 cur = cur.right
