@@ -79,10 +79,11 @@ class RBTree:
         """
         查找插入节点.
         :param insert:
-        :return:
+        :return: 如果树是空的，返回self.nil.
         """
         cur = self.root
 
+        node = self.nil
         while cur is not self.nil:
             node = cur
             if insert >= cur:
@@ -92,7 +93,7 @@ class RBTree:
 
         return node
 
-    def _fixrbtree(self, node):
+    def rbinsertfixup(self, node):
         """
         注: 为方便讨论, 给节点编号, 插入的节点标记C, 插入点标记P, 插入点的
         兄弟节点标记Pu, 插入点的父节点标记Pp.
@@ -115,32 +116,50 @@ class RBTree:
 
         c = node
         p = c.parent
-        pp = p.parent
-        pu = p.parent
 
         while p != self.root and p.color == 'r':
-            if pu.color == 'r':
-                p.color = 'b'
-                pu.color = 'b'
-                pp.color = 'r'
-
-                # 调整当前窗口.
-                c = pp
-                p = c.parent
+            if isleft(p):
                 pp = p.parent
-                pu = p.parent
-            else:
-                if not isleft(c):
-                    self._leftrotate(p)
+                pu = p.parent.right
 
-                    # 调整窗口
-                    tmp = p
-                    p = c
-                    c = tmp
+                if pu.color == 'r':
+                    p.color = 'b'
+                    pu.color = 'b'
+                    pp.color = 'r'
+
+                    # 调整当前窗口.
+                    c = pp
+                    p = c.parent
                 else:
+                    if not isleft(c):
+                        self._leftrotate(p)
+
+                        # 调整窗口
+                        p = c
                     p.color = 'b'
                     pp.color = 'r'
                     self._rightrotate(pp)
+                    break
+            else:
+                pp = p.parent
+                pu = p.parent.left
+                if pu.color == 'r':
+                    p.color = 'b'
+                    pu.color = 'b'
+                    pp.color = 'r'
+
+                    # 调整当前窗口.
+                    c = pp
+                    p = c.parent
+                else:
+                    if not isleft(c):
+                        self._leftrotate(p)
+
+                        # 调整窗口
+                        p = c
+                    p.color = 'b'
+                    pp.color = 'r'
+                    self._leftrotate(pp)
                     break
 
         if isroot(p):
@@ -148,31 +167,36 @@ class RBTree:
 
         return self.root
 
-    def insert(self, value):
+    def insert(self, value, comp=cmp):
         """向红黑树中插入一个值.
         :param value: 待插入的值.
         """
-        insert = Node(value, color='red')
+        insert = Node(value, color='red', comp=comp)
         node = self._findinsertposition(insert)
 
-        insert.parent = node
-        if node < insert:
-            node.right = insert
+        # 空树
+        if node == self.nil:
+            self.root = insert
         else:
-            node.left = insert
+            insert.parent = node
+            if node < insert:
+                node.right = insert
+            else:
+                node.left = insert
 
-        self._fixrbtree(insert)
+            self.rbinsertfixup(insert)
 
-    def create(self, nodes, comp):
+    def create(self, vl, comp=cmp):
         """从一列节点构造出红黑树, 不断调用insert方法插入节点.
-        :param nodes 红黑树的点的列表.
-        :param comp 节点比较大小的函数."""
-        pass
+        :param vl: 红黑树的点的列表.
+        :param comp: 节点比较大小的函数."""
+        for v in vl:
+            self.insert(v, comp)
 
     def delete(self, node, comp):
         """从红黑树中删除节点node.
-        :param node 要删除的节点.
-        :param comp 节点比较大小的函数."""
+        :param node: 要删除的节点.
+        :param comp: 节点比较大小的函数."""
         pass
 
     def find(self, value, comp):
