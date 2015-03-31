@@ -17,15 +17,15 @@
     2. 红黑树不为空, 找到插入点, 插入, 并将插入节点置为红色. 对树进行调整,
     满足红黑树性质. 分为以下几种情况讨论:
         注: 为方便讨论, 给节点编号, 插入的节点标记C, 插入点标记P, 插入点的
-        兄弟节点标记Pb, 插入点的父节点标记Pp.
+        兄弟节点标记Pu, 插入点的父节点标记Pp.
         (1). C是红色, 如果P是黑色, 就没有违反红黑树性质. 不用处理.
         (2). C是红色, 如果P是红色, Pp是黑色(这是显然的), P与C同为红色, 违
         反性质4.
-            (I).如果Pu是红色，就将P, Pu置为黑色， Pp置为红色，这样P,N就不
-            冲突。只有Pp与Ppp冲突的可能，但我们将发生冲突的节点向上移了一层。
+            (I).如果Pu是红色，就将P, Pu置为黑色， Pp置为红色，这样P,C就不
+            冲突。只有Pp与Ppp冲突的可能，但我们将发生冲突的节点向上移了一层。`
             冲突只会发生在一层，不断递归，我们可以将冲突的节点移到根节点，即
             根节点是是红色，到这一步，就只需将根节点置黑色就结束了。
-            (II). 如果Pu是黑色，N是P的左孩子节点(若是右孩子节点，就作下左旋
+            (II). 如果Pu是黑色，C是P的左孩子节点(若是右孩子节点，就作下左旋
             ，将其变为左孩子节点)，就将P,与Pp的颜色对换，P置为黑色，Pp置为红
             色，再从Pp处作右旋，就可以保证不冲突。
 
@@ -94,10 +94,58 @@ class RBTree:
 
     def _fixrbtree(self, node):
         """
+        注: 为方便讨论, 给节点编号, 插入的节点标记C, 插入点标记P, 插入点的
+        兄弟节点标记Pu, 插入点的父节点标记Pp.
+        (1). C是红色, 如果P是黑色, 就没有违反红黑树性质. 不用处理.
+        (2). C是红色, 如果P是红色, Pp是黑色(这是显然的), P与C同为红色, 违
+        反性质4.
+            (I).如果Pu是红色，就将P, Pu置为黑色， Pp置为红色，这样P,C就不
+            冲突。只有Pp与Ppp冲突的可能，但我们将发生冲突的节点向上移了一层。`
+            冲突只会发生在一层，不断递归，我们可以将冲突的节点移到根节点，即
+            根节点是是红色，到这一步，就只需将根节点置黑色就结束了。
+            (II). 如果Pu是黑色，C是P的左孩子节点(若是右孩子节点，就作下左旋
+            ，将其变为左孩子节点)，就将P,与Pp的颜色对换，P置为黑色，Pp置为红
+            色，再从Pp处作右旋，就可以保证不冲突。
         修正树, 使符合红黑树的性质.
-        :param node:
+        :param node: 插入的节点.
         :return:
         """
+        isleft = lambda x: x == x.parent.left
+        isroot = lambda x: x == self.root
+
+        c = node
+        p = c.parent
+        pp = p.parent
+        pu = p.parent
+
+        while p != self.root and p.color == 'r':
+            if pu.color == 'r':
+                p.color = 'b'
+                pu.color = 'b'
+                pp.color = 'r'
+
+                # 调整当前窗口.
+                c = pp
+                p = c.parent
+                pp = p.parent
+                pu = p.parent
+            else:
+                if not isleft(c):
+                    self._leftrotate(p)
+
+                    # 调整窗口
+                    tmp = p
+                    p = c
+                    c = tmp
+                else:
+                    p.color = 'b'
+                    pp.color = 'r'
+                    self._rightrotate(pp)
+                    break
+
+        if isroot(p):
+            p.color = 'b'
+
         return self.root
 
     def insert(self, value):
