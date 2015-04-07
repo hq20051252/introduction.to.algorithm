@@ -70,6 +70,7 @@ class RBTree:
     """
     """
     nil = Nil()
+    isleft = lambda x: x == x.parent.left
 
     def __init__(self, comp=cmp):
         self.root = None
@@ -193,11 +194,103 @@ class RBTree:
         for v in vl:
             self.insert(v, comp)
 
-    def delete(self, node, comp):
-        """从红黑树中删除节点node.
-        :param node: 要删除的节点.
-        :param comp: 节点比较大小的函数."""
-        pass
+    def delete(self, z):
+        """
+        参考<算法导论>第二版.
+        红黑树中删除节点与二叉树的删除方式是一样的,只是再结束后,调整
+        红黑树的性质.
+        从红黑树中删除节点z.
+        :param z: 要删除的节点.
+        """
+        if z.left == self.nil or z.right == self.nil:
+            y = z
+        else:
+            y = self.successor(z)
+
+        if y.left != self.Nil:
+            x = y.left
+        else:
+            x = y.right
+
+        x.parent = y.parent
+
+        if y.parent == self.nil:
+            self.root = x
+        elif self.isleft(y):
+            y.parent.left = x
+        else:
+            y.parent.right = x
+
+        if y != z:
+            z.value = y.value
+
+        if y.color == 'black':
+            self.rbdeletefixup(x)
+
+        return y
+
+    def rbdeletefixup(self, x):
+        while x != self.root and x.color == 'black':
+            # 分左右节点讨论
+            if self.isleft(x):
+                w = x.parent.right
+
+                # w分红黑讨论
+                if w.color == 'red':
+                    # Case 1
+                    w.color = 'black'
+                    x.parent.color = 'red'
+                    self._leftrotate(x.parent)
+                    w = x.parent.right
+                else:
+                    # 分左子节点红黑讨论
+                    if w.left.color == 'black' and w.right.color == 'black':
+                        # Case 2
+                        w.color = 'red'
+                        x = x.parent
+                    else:
+                        if w.right.color == 'black':
+                            # Case 3
+                            # w 的左子节点是红时, 作一个右旋变成Case4的情形
+                            w.left.color = 'black'
+                            w.color = 'red'
+                            self._rightrotate(w)
+                            w = x.parent.right
+                        # Case 4
+                        w.color = x.parent.color
+                        x.parent.color = 'black'
+                        w.right.color = 'black'
+                        self._leftrotate(x.parent)
+                        x = self.root
+            else:
+                w = x.parent.left
+
+                if w.color == 'red':
+                    # Case 1
+                    w.color = 'black'
+                    x.parent.color = 'red'
+                    self._rightrotate(x.parent)
+                    w = x.parent.left
+                else:
+                    if w.left.color == 'black' and w.right.color == 'black':
+                        # Case 2
+                        w.color = 'red'
+                        x = x.parent
+                    else:
+                        if w.left.color == 'black':
+                            # Case 3
+                            w.right.color = 'black'
+                            w.color = 'red'
+                            self._leftrotate(w)
+                            w = x.parent.left
+                        # Case 4
+                        w.color = x.parent.color
+                        x.parent.color = 'black'
+                        w.left.color = 'black'
+                        self._rightrotate(x.parent)
+                        x = self.root
+
+        x.color = 'black'
 
     def find(self, value, comp):
         """查找给定节点.
